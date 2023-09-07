@@ -30,3 +30,9 @@ dhcp-option=3,10.10.10.11
 #Bind Interface ens33
 interface=ens33
 ```
+
+Commandes restart
+
+```
+#/etc/init.d/dnsmasq restart
+```
