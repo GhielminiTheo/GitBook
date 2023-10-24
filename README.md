@@ -4,11 +4,9 @@ description: Configuration des VMs
 
 # Lin1
 
-
-
 ## Configuration réseau SRV-LIN1-01
 
-sudo pour avoir les droits administrateur sur un autre utilisateur
+sudo pour avoir les droits administrateur sur un autre utilisateur que l'utilisateur roo
 
 ```
 #nano /etc/network/intterfaces
@@ -43,8 +41,6 @@ sudo pour avoir les droits administrateur sur un autre utilisateur
 
 ## Configuration NAT
 
-
-
 <pre><code><strong>#echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf
 </strong>#sysctl -p /etc/sysctl.conf
 </code></pre>
@@ -56,9 +52,7 @@ sudo pour avoir les droits administrateur sur un autre utilisateur
 /sbin/iptables-save > /etc/iptables/rules.v4
 </code></pre>
 
-## Configuration DNS dnsmasq
-
-##
+## Configuration DNS : dnsmasq
 
 ```
 #apt -y install dnsmasq
