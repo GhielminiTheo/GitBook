@@ -243,4 +243,8 @@ Puis exécuter les commandes
 Changer les paramètres suivant dans en se connectant a : 10.10.10.11/lam
 
 1. Aller dans LAM configuration puis Edit server profiles et mettre le mot de passe lam
-2. Dans serveur settings  : mettre l'adresse suivant : ldap://srv-lin1-01:389 dans Server address.
+2. Dans serveur settings  -> Server address, mettre l'adresse suivant : ldap://srv-lin1-01:389
+3. Dans Tool settings -> Tree Suffix ajouter : dc=lin1,dc=local
+4. Dans security settings -> List of valid users : cn=admin,dc=lin1,dc=local
+5. Dans l'onglet, Account Types -> Active account types -> Users -> LDAP suffix -> ou=users,dc=lin1,dc=local
+6. Dans l'onglet, Account Types -> Active account types -> Groups -> LDAP suffix -> ou=groups,dc=lin1,dc=local
