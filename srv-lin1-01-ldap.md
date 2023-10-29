@@ -26,7 +26,7 @@ Installation de LDAP
 systemctl status slapd
 ```
 
-### 4. Création et ajout de la base de données ainsi que des OU et des utilisateurs&#x20;
+### 4. Création et ajout de la base de données ainsi que des organizational unit et des utilisateurs&#x20;
 
 1. Créer un dossier le dossier content : /etc/ldap/content
 2. Créer le fichier base.ldif
@@ -44,7 +44,7 @@ objectClass: top
 ou: groups
 ```
 
-Pour créer les OU users et groups.
+Pour créer les organizational unit users et groups.
 
 4. Dans le dossier /etc/ldap/content, créer le fichier groups.ldif
 5. Dans le fichier groups.ldif, ajouter :

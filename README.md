@@ -6,10 +6,10 @@ description: Configuration des VMs
 
 ## Configuration réseau SRV-LIN1-01
 
-sudo pour avoir les droits administrateur sur un autre utilisateur que l'utilisateur roo
+sudo pour avoir les droits administrateur sur un autre utilisateur que l'utilisateur root
 
 ```
-#nano /etc/network/intterfaces
+#nano /etc/network/interfaces
         # The primary interface INTERNET
         auto ens34
         iface ens34 inet DHCP
