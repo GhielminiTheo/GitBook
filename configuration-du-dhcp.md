@@ -4,6 +4,8 @@ description: Configuration du fichier dnsmasq.conf
 
 # Configuration du DHCP
 
+Configuration du fichier dnsmasq.conf afin que l'outil dnsmasq puisse servir de DHCP pour fournir une adresse automatiquement aux machines clientes.
+
 ```
 #domain-needed
 #bogus-priv

@@ -15,3 +15,15 @@ nano /etc/network/interfaces
   gateway 10.10.10.11
 ```
 
+Configuration du nom de la machine
+
+```
+#hostnamectl set-hostname nas-lin1-01.lin1.local
+#hostname -f
+```
+
+Appliquer les modifications
+
+```
+# Reboot
+```
