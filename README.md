@@ -73,21 +73,22 @@ sudo pour avoir les droits administrateur sur un autre utilisateur que l'utilisa
 #systemctl restart dnsmasq.service
 ```
 
-## Configuration des autres serveurs
+## Configuration de srv-lin1-02
 
 ```
 #nano /etc/network/interfaces
-  # Interface xxxx LOCAL
-  auto xxxx
-  iface xxxx inet static
-  address 10.10.10.xx/24
+  # Interface ens33 LOCAL
+  auto ens33
+  iface ens33 inet static
+  address 10.10.10.22/24
   gateway 10.10.10.11
 ```
 
-<pre><code><strong>#hostnamectl set-hostname xxx-lin1-xx.lin1.local
+<pre><code><strong>#hostnamectl set-hostname srv-lin1-02.lin1.local
 </strong></code></pre>
 
 <pre><code><strong>#nano /etc/resolv.conf
+</strong><strong>    domain lin1.local
 </strong><strong>    search lin1.local
 </strong><strong>    nameserver 10.10.10.11
 </strong></code></pre>
