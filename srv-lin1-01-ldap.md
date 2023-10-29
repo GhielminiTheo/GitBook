@@ -222,9 +222,9 @@ Afin que les utilisateurs soient ajoutés dans leur groupes dans l'annuaire
 </strong># ldapmodify -x -D cn=admin,dc=lin1,dc=local -f /etc/ldap/content/addtogroup.ldif -w Pa$$w0rd
 </code></pre>
 
-### Installation de LDAP Account Manager
+### 5. Installation de LDAP Account Manager
 
-D'abord installer le packet wget&#x20;
+D'abord installer le paquet "wget"&#x20;
 
 ```
 # apt-get install wget
@@ -239,3 +239,8 @@ Puis exécuter les commandes
 
 ```
 {% endcode %}
+
+Changer les paramètres suivant dans en se connectant a : 10.10.10.11/lam
+
+1. Aller dans LAM configuration puis Edit server profiles et mettre le mot de passe lam
+2. Dans serveur settings  : mettre l'adresse suivant : ldap://srv-lin1-01:389 dans Server address.
