@@ -120,7 +120,7 @@ major minor  #blocks  name
 Si ce n'est pas fait installer parted avec la commande
 
 ```
-# apt-get intsall parted -y
+# apt-get install parted -y
 ```
 
 Puis taper ces trois commandes :
