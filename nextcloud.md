@@ -61,5 +61,6 @@ Télécharger la dernière version de Nextcloud
 ```
 
 ```
+# unzip nextcloud-22.2.0.zip -d /var/www/html/
 ```
 
