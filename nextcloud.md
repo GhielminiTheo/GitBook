@@ -60,7 +60,13 @@ Télécharger la dernière version de Nextcloud
 # wget https://download.nextcloud.com/server/releases/nextcloud-27.1.1.zip
 ```
 
-Ensuite il unzip le fichier dans le dossier /var/www/html/
+Si pas déjà fait installer l'outil "unzip"
+
+```
+# apt-get install unzip
+```
+
+Ensuite il faut unzip le fichier dans le dossier /var/www/html/
 
 ```
 # unzip nextcloud-27.1.1.zip -d /var/www/html/
@@ -71,4 +77,14 @@ Pour se connecter à Nextcloud sur l'interface web avec l'adresse IP. Si j'utili
 ```
 http://10.10.10.22/nextcloud
 ```
+
+Pour finir la configuration de Nextcloud sur l'interface web
+
+<figure><img src=".gitbook/assets/Install Nextcloud.png" alt=""><figcaption><p>Création de l'utilisateur administrateur ainsi connexion à la base de donnée</p></figcaption></figure>
+
+Ensuite pour déplacer la Nextcloud sur la target du NAS, aller dans&#x20;
+
+
+
+
 
