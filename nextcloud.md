@@ -57,10 +57,18 @@ Si ce n'est pas déjà fait installer le paquet wget
 Télécharger la dernière version de Nextcloud
 
 ```
-# wget https://download.nextcloud.com/server/releases/nextcloud-27.1.2.zip
+# wget https://download.nextcloud.com/server/releases/nextcloud-27.1.1.zip
 ```
 
+Ensuite il unzip le fichier dans le dossier /var/www/html/
+
 ```
-# unzip nextcloud-22.2.0.zip -d /var/www/html/
+# unzip nextcloud-27.1.1.zip -d /var/www/html/
+```
+
+Pour se connecter à Nextcloud sur l'interface web avec l'adresse IP. Si j'utilise le nom de la machine il y a un problème de trusted\_domain.
+
+```
+http://10.10.10.22/nextcloud
 ```
 
