@@ -2,7 +2,9 @@
 description: Configuration des VMs serveur 01 et 02
 ---
 
-# Configuration de srv-lin1-01 et srv-lin1-02
+# Documentation LIN1 - Ghielmini Théo
+
+## Configuration réseau des machines srv-lin1-01 et srv-lin1-02
 
 ## Configuration réseau SRV-LIN1-01
 
