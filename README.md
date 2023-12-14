@@ -541,7 +541,7 @@ Nous allons utiliser des conteneurs `Elasticsearch` pour tester cela.
 Pour lancer un service nommé `search` exécutant 4 conteneurs `elasticsearch` sur notre cluster, et accessible sur le port `9200`, exécutez:
 
 ```bash
-docker@host1:~$ docker service create --name search --publish 9200:9200 --replicas 4 elasticsearch:8.11.1
+docker@host1:~$ docker service create --name search --publish 9200:9200 --replicas 3 elasticsearch:8.11.1
 ```
 
 Vous pouvez afficher les détails de notre service avec la commande docker service ls:
