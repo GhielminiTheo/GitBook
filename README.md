@@ -379,7 +379,7 @@ docker@host1:~$ docker node ls
 
 Cette commande `node` ne fonctionne que sur un manager de cluster `swarm`.
 
-### Installation de visualizer
+#### Installation de visualizer
 
 <pre class="language-bash"><code class="lang-bash"><strong>docker@host1$ docker service create --name visualizer --publish 8080:8080 --constraint=node.role==manager --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock dockersamples/visualizer
 </strong></code></pre>
@@ -393,6 +393,13 @@ Ainsi pour ajouter `host2` comme noeud à notre cluster:
 <pre class="language-bash"><code class="lang-bash"><strong>$ docker-machine ssh host2
 </strong>$ docker swarm join --token SWMTKN-1-1ynromdvs7kjz4zsqzufee4kagoppz8bq6ezvnyph5ddjq9w5w-a3n0z765rvorqzu3jmaq6bqvt 192.168.40.154:2377
 </code></pre>
+
+Ajout du host3
+
+```bash
+$ docker-machine ssh host3
+$ docker swarm join --token SWMTKN-1-1ynromdvs7kjz4zsqzufee4kagoppz8bq6ezvnyph5ddjq9w5w-a3n0z765rvorqzu3jmaq6bqvt 192.168.40.154:2377
+```
 
 Vous pouvez vérifier l’ajout de ce nouveau noeud à notre cluster:
 
@@ -441,7 +448,11 @@ On vient de décider que tous nos nœuds doivent être des managers, il faut don
 Commencez par promouvoir `host1`, en exécutant la commande suivante depuis un manager:
 
 ```bash
-docker@host1$ docker node promote host
+docker@host1$ docker node promote host2
+```
+
+```bash
+docker@host1$ docker node promote host2
 ```
 
 Vérifiez la promotion avec:
@@ -458,7 +469,7 @@ Pour exécuter des conteneurs via notre cluster, on n’utilise pas `run`, mais 
 
 ```bash
 docker@host1$ docker service create alpine ping 8.8.8.8
-cdg5u075103ly8qqhq1gns7ki
+jvlsdefz8sf587bsua49k8y39
 ```
 
 Le code affiché, est l’identifiant de notre nouveau service (on peut aussi donner un nom à un service à la création, par commodité).
@@ -466,22 +477,17 @@ Le code affiché, est l’identifiant de notre nouveau service (on peut aussi do
 Pour afficher où le conteneur a été créé sur le cluster, on utilise la commande `service ps` avec l’identifiant (ou le nom) du service en paramètre:
 
 ```bash
-$ docker service ps cdg5u075103ly8qqhq1gns7k
-ID NAME IMAGE NODE DESIRED STATE CURRENT
-STATE ERROR
-el7g50qm3p0zg5ajmsdfz9lav lonely_yalow.1 alpine PB650-01 Running Running 57
-seconds ago
+docker@host1:~$ docker service ps jvlsdefz8sf587bsua49k8y39
+ID                  NAME                IMAGE               NODE                DESIRED STATE       CURRENT STATE                ERROR               PORTS
+uk3potoqfyqu        nervous_morse.1     alpine:latest       host2               Running             Running about a minute ago
 ```
 
 Pour pouvoir afficher la sortie de la commande exécutée par notre service, il faut se connecter à l’hôte exécutant le conteneur, faire un docker ps pour trouver l’identifiant du conteneur:
 
 ```bash
-$ eval $(docker-machine env -u)
-$ docker ps
-CONTAINER ID IMAGE COMMAND CREATED STATUS
-PORTS NAMES
-d1070bc186b2 alpine:latest "ping 8.8.8.8" 4 minutes ago Up 4
-minutes lonely_yalow.1.el7g50qm3p0zg5ajmsdfz9lav
+docker@host2:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+20dfb900bea6        alpine:latest       "ping 8.8.8.8"      8 minutes ago       Up 8 minutes                            nervous_morse.1.uk3potoqfyqulr76ofccnda7h
 ```
 
 Puis faire un `docker logs` :
@@ -497,16 +503,27 @@ Tout comme `Docker Compose`, `Swarm`, permet de passer un service à l’échell
 Pour passer à l’échelle notre service en exécutant 2 copies par hôtes (2x3=6):
 
 ```bash
-$ docker service update cdg5u075103ly8qqhq1gns7ki --replicas 6
+docker@host1:~$ docker service update jvlsdefz8sf587bsua49k8y39 --replicas 6
 ```
 
 Vérifiez cela avec la commande:
 
 ```bash
-$ docker service ps cdg5u075103ly8qqhq1gns7ki
+docker@host1:~$ docker service ps jvlsdefz8sf587bsua49k8y39
+ID                  NAME                IMAGE               NODE                DESIRED STATE       CURRENT STATE                ERROR               PORTS
+uk3potoqfyqu        nervous_morse.1     alpine:latest       host2               Running             Running 13 minutes ago
+83mwb7unld7q        nervous_morse.2     alpine:latest       host3               Running             Running 57 seconds ago
+v3n8rsom3wib        nervous_morse.3     alpine:latest       host1               Running             Running 56 seconds ago
+tyc8xl6a38ve        nervous_morse.4     alpine:latest       host3               Running             Running 57 seconds ago
+xvtf0rsy595e        nervous_morse.5     alpine:latest       host1               Running             Running 56 seconds ago
+sg4lnscclj8z        nervous_morse.6     alpine:latest       host2               Running             Running about a minute ago
 ```
 
 > Passez le service à l’échelle avec 3 copies par hôte.
+
+```
+docker@host1:~$ docker service scale jvlsdefz8sf587bsua49k8y39=3
+```
 
 ### 3.8. Exposer un service
 
@@ -524,16 +541,17 @@ Nous allons utiliser des conteneurs `Elasticsearch` pour tester cela.
 Pour lancer un service nommé `search` exécutant 4 conteneurs `elasticsearch` sur notre cluster, et accessible sur le port `9200`, exécutez:
 
 ```bash
-$ docker service create --name search --publish 9200:9200 --replicas 4 elasticsearch
+docker@host1:~$ docker service create --name search --publish 9200:9200 --replicas 4 elasticsearch:8.11.1
 ```
 
 Vous pouvez afficher les détails de notre service avec la commande docker service ls:
 
 ```bash
-$ docker service ls
-ID NAME REPLICAS IMAGE COMMAND
-94di6w0flutk search 0/4 elasticsearch
-cdg5u075103l lonely_yalow 10/10 alpine ping 8.8.8.
+docker@host1:~$ docker service ls
+ID                  NAME                MODE                REPLICAS            IMAGE                             PORTS
+jvlsdefz8sf5        nervous_morse       replicated          3/3                 alpine:latest
+k6vnx25y3qiv        search              replicated          4/4                 elasticsearch:8.11.1              *:9200->9200/tcp
+rqjmtrupg1gp        visualizer          replicated          1/1                 dockersamples/visualizer:latest   *:8080->8080/tcp
 ```
 
 D’après la commande précédente, 0/4 replicas sont disponibles.
@@ -541,7 +559,21 @@ D’après la commande précédente, 0/4 replicas sont disponibles.
 Utilisez la commande `ps` pour connaître l’état des nœuds exécutant votre service.
 
 ```bash
-$ docker service ps search
+docker@host1:~$ docker service ps search
+ID                  NAME                IMAGE                  NODE                DESIRED STATE       CURRENT STATE                  ERROR                        PORTS
+fu17swu9a4ah        search.1            elasticsearch:8.11.1   host2               Ready               Ready less than a second ago
+49vp9gt1h2u8         \_ search.1        elasticsearch:8.11.1   host2               Shutdown            Failed 1 second ago            "task: non-zero exit (78)"
+qil8n9qgj08s         \_ search.1        elasticsearch:8.11.1   host2               Shutdown            Failed about a minute ago      "task: non-zero exit (78)"
+l58np0znh3ws        search.2            elasticsearch:8.11.1   host3               Running             Running 14 seconds ago
+pfesg6gdivgj         \_ search.2        elasticsearch:8.11.1   host3               Shutdown            Failed 20 seconds ago          "task: non-zero exit (78)"
+vgo0bzztn9kh         \_ search.2        elasticsearch:8.11.1   host2               Shutdown            Failed about a minute ago      "task: non-zero exit (78)"
+11krsdil3wyh        search.3            elasticsearch:8.11.1   host2               Running             Running about a minute ago
+4orv48yfs5re         \_ search.3        elasticsearch:8.11.1   host3               Shutdown            Failed about a minute ago      "task: non-zero exit (78)"
+l5k7q40s3jbt         \_ search.3        elasticsearch:8.11.1   host3               Shutdown            Failed 2 minutes ago           "task: non-zero exit (78)"
+yppcrgvwmtde        search.4            elasticsearch:8.11.1   host1               Running             Running 1 second ago
+7e9vuu5xixhi         \_ search.4        elasticsearch:8.11.1   host1               Shutdown            Failed 7 seconds ago           "task: non-zero exit (78)"
+nnk0p5vm9uub         \_ search.4        elasticsearch:8.11.1   host1               Shutdown            Failed about a minute ago      "task: non-zero exit (78)"
+ss3lllt256ta         \_ search.4        elasticsearch:8.11.1   host1               Shutdown            Failed 2 minutes ago           "task: non-zero exit (78)"
 ```
 
 > Quel est l’état de la plupart de vos nœuds ? Que cela signifie-t’il ?
