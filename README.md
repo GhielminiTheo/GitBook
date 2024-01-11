@@ -646,14 +646,11 @@ $ docker service ps redis
 Une fois que redis est prêt, exécutez les services `hasher`, `rng` et `worker` :
 
 ```bash
-$ docker service create --network dockercoins --name rng
-humboldtux/dockercoins_rng:0.
+$ docker service create --network dockercoins --name rng theoghi/dockercoins_rng:0.
 
-$ docker service create --network dockercoins --name hasher
-humboldtux/dockercoins_hasher:0.
+$ docker service create --network dockercoins --name hasher theoghi/dockercoins_hasher:0.
 
-$ docker service create --network dockercoins --name worker
-humboldtux/dockercoins_worker:0.
+$ docker service create --network dockercoins --name worker theoghi/dockercoins_worker:0.
 ```
 
 Surveillez que ces services soient en "`running`" avec:
@@ -667,14 +664,13 @@ $ docker service ps rng
 Dès qu’ils sont prêts, lancez le service de l’interface web :
 
 ```bash
-$ docker service create --name webui --network dockercoins -p 8000:
-humboldtux/dockercoins_webui
+docker@host1~$ docker service create --name webui --network dockercoins -p 8000: theoghi/dockercoins_webui
 ```
 
 Une fois que le service webui est prêt :
 
 ```bash
-$ docker service ps webui
+docker@host1~$ docker service ps webui
 ```
 
 Et vous pourrez ouvrir votre navigateur à l’adresse de n’importe quel hôte Docker, sur le port `8000`, pour afficher la `webui`.
@@ -686,7 +682,7 @@ Et vous pourrez ouvrir votre navigateur à l’adresse de n’importe quel hôte
 Comme avec les exemples ping et search, passez notre service worker à l’échelle:
 
 ```bash
-$ docker service update worker --replicas 8
+docker@host1~$ docker service update worker --replicas 8
 ```
 
 Surveillez l’état du service avec `docker service ps worker`, une fois que tous les replicas sont en `running`, affichez la `webui`.
@@ -702,23 +698,20 @@ Nous voulons exécuter exactement une instance `rng` par nœud, `Swarm` a une op
 Il faut commencer par supprimer notre service `rng` existant:
 
 ```bash
-$ docker service rm rng
+docker@host1~$ docker service rm rng
 ```
 
 Puis le recréer avec le `scheduling` global:
 
-```bash
-$ docker service create --name rng --network dockercoins --mode global
-humboldtux/dockercoins_rng:0.
-```
+<pre class="language-bash"><code class="lang-bash"><strong>docker@host1~$ docker service create --name rng --network dockercoins --mode global theoghi/dockercoins_rng:0.
+</strong></code></pre>
 
 Vérifiez que une instance seulement de `rng` s’exécute sur chaque node avec:
 
-```bash
-$ docker service ps rng
-```
+<pre class="language-bash"><code class="lang-bash"><strong>docker@host1~$ docker service ps rng
+</strong></code></pre>
 
-> Ouvrez la `webui`, quel est votre vitesse de génération de `Dockercoins` ?
+> Ouvrez la `webui`, quel est votre vitesse de génération de `Dockercoins` ?&#x20;
 
 #### **3.10.5. Mise à jour d’un service**
 
@@ -729,18 +722,18 @@ Nous allons utiliser la commande service update pour faire un `rolling-update` d
 Dans une fenêtre, exécutez la commande suivante, qui va nous permettre de vérifier le déroulement de notre `rolling-update` :
 
 ```bash
-$ watch -n1 "docker service ps worker | grep -v Shutdown.*Shutdown"
+docker@host1~$ watch -n1 "docker service ps worker | grep -v Shutdown.*Shutdown"
 ```
 
 Dans une autre fenêtre, indiquez à notre cluster d’utiliser la version `0.2` mise à jour du conteneur `humboldtux/dockercoins_worker` pour notre service `worker` :
 
 ```bash
-$ docker service update worker --image humboldtux/dockercoins_worker:0.2
+docker@host2~$ docker service update worker --image humboldtux/dockercoins_worker:0.2
 ```
 
 Attendez un peu que toutes les instances soient mises à jour, en surveillant la commande `watch` du premier terminal.
 
-> Une fois toutes les instances de `worker` mises à jour, quel est le taux de génération de `dockercoins` ?
+> Une fois toutes les instances de `worker` mises à jour, quel est le taux de génération de `dockercoins` ? entre 15 et 30
 
 #### **3.10.6. Configuration du comportement des rolling-update**
 
@@ -752,173 +745,18 @@ Afin de rendre des `rolling-update` plus rapides ou lentes, vous pouvez indiquer
 On va utiliser ces paramètres pour configurer le comportement de mise à jour de notre service `worker` :
 
 ```bash
-$ docker service update worker --update-parallelism 2 --update-delay 5s
+docker@host2~$ docker service update worker --update-parallelism 2 --update-delay 5s
 ```
 
 Puis faites un `downgrade` du service en version `0.1` :
 
 ```bash
-$ docker service update worker --image humboldtux/dockercoins_worker:0.1
+docker@host2~$ docker service update worker --image theoghi/dockercoins_worker:0.1
 ```
 
-> Attendez que les instances soient downgradées, quel est le taux de génération de `Dockercoins` ?
+> Attendez que les instances soient downgradées, quel est le taux de génération de `Dockercoins` ? entre 15 et 25
 
 > Modifiez la configuration de mise à jour du service `worker` avec 3 instances mises à jour en parallèle, et un délai de 2 secondes. Puis refaites la mise à jour du service `worker` en version `0.2`.
 
-### 3.11. Logs
+###
 
-Notre cluster est en fonctionnement, il exécute beaucoup d’applications, qui génère beaucoup de logs, à monitorer pour s’assurer le bon fonctionnement de notre application. Comment voir les logs de ces applications ? Il n’existe pas de solution simple actuellement.
-
-Nous allons monter un cluster d’aggrégations de logs. Il est basé sur `Logstash` pour récupérer les logs, `Elasticsearch` pour les indexer, et `Kibana` pour les visualiser via une interface web.
-
-{% embed url="https://fr.wikipedia.org/wiki/Logstash" %}
-
-{% embed url="https://fr.wikipedia.org/wiki/Kibana" %}
-
-Tous ces services s’exécuteront dans leur réseau. Les instances des différents services `rng`, `hasher`, ... seront reconfigurés pour envoyer leurs logs vers le `logstash` du cluster de logs.
-
-#### **3.11.1. Setup**
-
-On commence par créer le réseau nécessaire:
-
-```bash
-$ docker network create --driver overlay logging
-```
-
-Puis lançons les différents services:
-
-```bash
-$ docker service create --network logging --name elasticsearch elasticsearch
-$ docker service create --network logging --name kibana --publish 5601:5601 -e
-ELASTICSEARCH_URL=http://elasticsearch:9200 kibana
-$ docker service create --network logging --name logstash -p 12201:12201/udp
-logstash -e "$(cat ~/docker/orchestration-workshop/elk/logstash.conf)"
-```
-
-#### **3.11.2. Test du setup**
-
-On va vérifier que la récupération des `logs` fonctionne en envoyant un message de `test`. Commencez par valider que le service `logstash` est bien en "`running`":
-
-```bash
-$ docker service ps logstash
-```
-
-Connectez-vous à l’hôte exécutant le service `logstash` pour pouvoir suivre en direct les messages reçus :
-
-```bash
-$ eval $(docker-machine env host1)
-$ docker logs --follow $(docker ps -q --filter
-label=com.docker.swarm.service.name=logstash)
-```
-
-Dans une nouvelle fenêtre, générez un message de log :
-
-```bash
-Page 1$ docker run --log-driver gelf --log-opt gelf-address=udp://127.0.0.1:12201 --rm
-alpine echo hello
-```
-
-Ce message test devrait apparaître dans la première fenêtre.
-
-#### **3.11.3. Rediriger les logs de nos services vers le cluster de logs**
-
-Pour rediriger les logs de nos différents services, il faut utiliser la commande `service update` en précisant le pilote de logs désiré.
-
-Lancez la commande suivante :
-
-```bash
-$ for SERVICE in hasher rng webui worker; do
-docker service update $SERVICE \
---log-driver gelf --log-opt gelf-address=udp://127.0.0.1:12201
-done
-```
-
-Les messages dans la première fenêtre devraient être un peu plus nombreux.
-
-#### **3.11.4. Visualiser les logs dans Kibana**
-
-Nos logs sont navigables depuis l’interface web de `Kibana`. Ouvrez votre navigateur à l’adresse d’un des hôtes Docker, port `5601`.
-
-Il vous faut configurer l’affichage de `Kibana`:
-
-* Dans la liste déroulante "`Time-field name`", sélectionnez "`@timestamp`", et cliquez "`Create`",
-* cliquez "`Discover`" (tout en haut à gauche)
-* cliquez "`Last 15 minutes`" (tout en haut à droite)
-* cliquez "`Last 1 hour`" (dans la liste au milieu)
-* cliquez "`Auto-refresh`" (tout en haut à droite)
-* cliquez "`5 seconds`" (dans la liste de gauche)
-
-Le graphique vous affiche sous forme de barres la fréquence de réception des logs. En dessous, le contenu des messages reçus.
-
-Vous pouvez encore afficher l’affichage des messages, en n’affichant que ce qui vous intéresse. Dans la colonne de gauche, survolez chacun des éléments suivants, et cliquez sur le bouton `add` qui apparaît au survol:
-
-* `host`
-* `container_name`
-* `message`
-
-Une fois que vous avez fini de tester votre cluster de log, vous pouvez supprimer tous les services, que ce soit ceux des logs ou de `Dockercoins` :
-
-```bash
-$ docker service rm $(docker service ls -q)
-```
-
-### 3.12. Compose avec Swarm
-
-Nous allons utiliser `Compose` pour générer notre application dans notre cluster `Swarm`. On a besoin d’utiliser une configuration légèrement différente, dont le fichier est déjà disponible dans les sources de notre projet:
-
-```bash
-$ mv docker-compose.yml-images docker-compose.yml
-```
-
-On configure ensuite des variables d’environnement dont a besoin cette nouvelle configuration:
-
-```bash
-$ eval $(docker-machine env -u)
-$ export COLON_TAG=:0.1
-$ export REGISTRY_SLASH=humboldtux/dockercoins_
-```
-
-On récupère ensuite les différentes images de cette configuration en local:
-
-```bash
-$ docker-compose pull
-```
-
-On peut ensuite générer un `bundle` utilisable par `Swarm` avec:
-
-```bash
-$ docker-compose bundle
-```
-
-Cette commande génère un fichier j`son dockercoins.dab` utilisable par la commande `swarm` de docker :
-
-```bash
-$ docker stack deploy dockercoins
-```
-
-```bash
-$ docker stack ps dockercoins
-```
-
-La commande stable de docker vous permet de visualiser les services de la `stack`:
-
-```bash
-$ docker service ls
-```
-
-Lancez cette commande pour savoir sur quel port est lancé la `webui`:
-
-```bash
-$ docker service inspect dockercoins_webui --format '{{ (index .Endpoint.Ports
-0).PublishedPort }}'
-```
-
-Ouvrez votre navigateur à cette adresse pour visualiser votre taux de génération de `Dockercoins`.
-
-La commande `stack` ne permet pas encore de tout faire avec les différents services de la `stack`. Mais vous pouvez utiliser la commande service pour interagir individuellement avec les services. Par exemple, `scaler` le service `dockercoins_worker` à 10 replicas.
-
-Lorsque que vous avez fini de vous amuser avec votre `stack`, supprimez-la avec la commande suivante :
-
-```bash
-$ ~/docker/docker stack rm dockercoins
-```
