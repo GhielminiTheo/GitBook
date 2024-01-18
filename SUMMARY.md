@@ -1,3 +1,3 @@
 # Table of contents
 
-* [TP Dockercoins](README.md)
+* [TP Dockercoins - Ghielmini Théo](README.md)
