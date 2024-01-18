@@ -30,7 +30,7 @@ Le minage c’est le procédé par lequel les transactions Bitcoin sont sécuris
 
 Notre application exemple est `Dockercoins`, une application de minage de Dockercoins ! Toutes les ressources de cette application (fictive et complètement inutile) sont disponibles sur le dépôt du projet.
 
-{% embed url="https://github.com/7ric/Dockercoins" %}
+{% embed url="https://github.com/GhielminiTheo/Dockercoins.git" %}
 
 Elle est composée de 5 applications contenues dans le dossier dockercoins:
 
@@ -53,7 +53,7 @@ Vous remarquerez dans les codes précédents que chaque service est appelé par 
 Récupérez les sources de cette application:
 
 ```bash
-$ git clone https://github.com/7ric/Dockercoins
+$ git clone https://github.com/GhielminiTheo/Dockercoins.git
 ```
 
 ### Pré-requis:
@@ -622,7 +622,7 @@ Affichez le détails de notre réseau :
 $ docker network ls
 ```
 
-> Quelle est la différence de notre réseau `dockercoins` comparé aux autres ?
+> Quelle est la différence de notre réseau `dockercoins` comparé aux autres ? Toutes les machines du swarm sont connectées a ce network
 
 #### **3.10.2. Création des services dans notre réseau**
 
