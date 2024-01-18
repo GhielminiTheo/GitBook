@@ -1,4 +1,4 @@
-# TP Dockercoins
+# TP Dockercoins - Ghielmini Théo
 
 {% hint style="info" %}
 **Résumé**
@@ -76,7 +76,11 @@ Pour pouvoir utiliser `Compose`, il faut se placer dans un dossier qui contient 
 
 Placez-vous dans le dossier de l'application `Dockercoins` :
 
-> Lisez ce fichier docker-compose.yml, décrivez-le. Combien y-a-t’il de services différents ? Combien de ces services utilisent une image officielle ? Sur quel port local a lieu la redirection du service webui ?
+> Lisez ce fichier docker-compose.yml, décrivez-le. Combien y-a-t’il de services différents ?  5 services
+>
+> Combien de ces services utilisent une image officielle ? Tous
+>
+> Sur quel port local a lieu la redirection du service webui ? sur le port 8000
 
 {% hint style="info" %}
 Redis un un logiciel serveur de base de données `nosql`. C’est ce logiciel qui sera utilisé par notre application pour stocker les `Dockercoins`. Une image officielle `redis` est utilisée pour l’exécuter.
