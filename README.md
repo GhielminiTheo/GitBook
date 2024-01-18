@@ -264,7 +264,7 @@ Une `ip` a été attribuée à ce serveur Docker, et l’adresse `tcp://IP/PORT`
 docker-machine ip host1
 ```
 
-> Quelle est l’`ip` de votre serveur Docker `host1` ?
+> Quelle est l’`ip` de votre serveur Docker `host1` ? 192.168.40.154
 
 ### 2.3. Utilisation
 
@@ -312,7 +312,7 @@ docker images
 
 puis le conteneur est lancé et un `Nginx` exécuté.
 
-> Sur quel port s’exécute ce Nginx ? A quelle adresse ouvrir votre navigateur pour afficher la page d’accueil de cet Nginx ?
+> Sur quel port s’exécute ce Nginx ? 80 A quelle adresse ouvrir votre navigateur pour afficher la page d’accueil de cet Nginx ? adresse ip : 192.168.40.154:80
 
 ### 2.5. Créer un deuxième hôte
 
@@ -329,10 +329,10 @@ docker run -it busybox echo "Coucou"
 Affichez les images avec la commande :
 
 ```bash
-docker images
+docker images ls
 ```
 
-> Quelles sont les images affichées ? Est-ce que vous voyez l’image `Nginx` ? Pourquoi ?
+> Quelles sont les images affichées ? Busybox Est-ce que vous voyez l’image `Nginx` ? Non Pourquoi ? Car le swarn n'as pas encore été créé.
 
 **Pour la suite, nous allons monter un cluster de serveurs Docker.**
 
@@ -416,19 +416,13 @@ To add a manager to this swarm, run the following command:
 ```
 
 ```bash
-$ docker swarm join \
---token SWMTKN-1-2hdpt85zfkdnbbbwagfunjifx14njv4rg9uwahdjdgt8ukgemb-
-bi4dfw61zwogg7f4ux2w2hre1 \
-192.168.99.1:
+$ docker swarm join --token SWMTKN-1-2hdpt85zfkdnbbbwagfunjifx14njv4rg9uwahdjdgt8ukgemb-bi4dfw61zwogg7f4ux2w2hre1 192.168.99.1:
 ```
 
 Votre commande sera légèrement différente. Notez-la, puis activez la connexion à `host2`, et exécutez-là pour ajouter `host2` à notre cluster en tant que manager :
 
 ```bash
-$ eval $(docker-machine env host2)
-$ docker swarm join --token SWMTKN-1-
-2hdpt85zfkdnbbbwagfunjifx14njv4rg9uwahdjdgt8ukgemb-bi4dfw61zwogg7f4ux2w2hre
-192.168.99.1:
+$ docker swarm join --token SWMTKN-1-2hdpt85zfkdnbbbwagfunjifx14njv4rg9uwahdjdgt8ukgemb-bi4dfw61zwogg7f4ux2w2hre 192.168.40.154:2377
 ```
 
 Vérifiez que `host2` a bien été ajouté en tant que manager à notre cluster:
@@ -576,7 +570,9 @@ nnk0p5vm9uub         \_ search.4        elasticsearch:8.11.1   host1            
 ss3lllt256ta         \_ search.4        elasticsearch:8.11.1   host1               Shutdown            Failed 2 minutes ago           "task: non-zero exit (78)"
 ```
 
-> Quel est l’état de la plupart de vos nœuds ? Que cela signifie-t’il ?
+> Quel est l’état de la plupart de vos nœuds ? Failed&#x20;
+>
+> Que cela signifie-t’il ?&#x20;
 
 Il va falloir un peu de temps pour que tous les nœuds soient "`running`". Pour surveiller cela sans taper indéfiniment la commande précédente, exécutez:
 
@@ -587,7 +583,7 @@ $ watch docker service ps search
 Lorsque que tous les nœuds sont en `running`, vous requêtez l’`API REST` des différentes instances depuis n’importe quelle `ip` du cluster:
 
 ```bash
-$ curl $(docker-machine ip host1):
+$ curl 192.168.40.154
 ```
 
 Les requêtes sont load-balancées entre les différentes instances du service. Vous pouvez le vérifier avec la commande suivante:
@@ -617,7 +613,6 @@ Nous avons besoin de créer un réseau pour isoler tous les services de notre ap
 Créez notre réseau :
 
 ```bash
-$ eval $(docker-machine env -u)
 $ docker network create --driver overlay dockercoins
 ```
 
@@ -634,32 +629,30 @@ $ docker network ls
 Créez le service exécutant la base `redis` :
 
 ```bash
-$ docker service create --network dockercoins --name redis redis
+docker@host1~$ docker service create --network dockercoins --name redis theoghi/redis:5
 ```
 
 Attendez que le serveur soit en "`running`" à l’aide de:
 
 ```bash
-$ docker service ps redis
+docker@host1~$ docker service ps redis
 ```
 
 Une fois que redis est prêt, exécutez les services `hasher`, `rng` et `worker` :
 
-```bash
-$ docker service create --network dockercoins --name rng theoghi/dockercoins_rng:0.
+<pre class="language-bash"><code class="lang-bash">docker@host1~$ docker service create --network dockercoins --name rng theoghi/dockercoins_rng
 
-$ docker service create --network dockercoins --name hasher theoghi/dockercoins_hasher:0.
-
-$ docker service create --network dockercoins --name worker theoghi/dockercoins_worker:0.
-```
+<strong>docker@host1~$ docker service create --network dockercoins --name hasher theoghi/dockercoins_hasher
+</strong>
+docker@host1~$ docker service create --network dockercoins --name worker theoghi/dockercoins_worker:0.1
+</code></pre>
 
 Surveillez que ces services soient en "`running`" avec:
 
-```bash
-$ docker service ps hasher
-$ docker service ps worker
-$ docker service ps rng
-```
+<pre class="language-bash"><code class="lang-bash"><strong>docker@host1~$ docker service ps hasher
+</strong><strong>docker@host1~$ docker service ps worker
+</strong>docker@host1~$ docker service ps rng
+</code></pre>
 
 Dès qu’ils sont prêts, lancez le service de l’interface web :
 
@@ -675,7 +668,7 @@ docker@host1~$ docker service ps webui
 
 Et vous pourrez ouvrir votre navigateur à l’adresse de n’importe quel hôte Docker, sur le port `8000`, pour afficher la `webui`.
 
-> Quel est le taux de génération de `Dockercoins` ?
+> Quel est le taux de génération de `Dockercoins` ? 4 par secondes
 
 #### **3.10.3. Passage à l’échelle sous Swarm**
 
@@ -687,7 +680,7 @@ docker@host1~$ docker service update worker --replicas 8
 
 Surveillez l’état du service avec `docker service ps worker`, une fois que tous les replicas sont en `running`, affichez la `webui`.
 
-> Quel est le taux de génération de `dockercoins`?
+> Quel est le taux de génération de `dockercoins`? 10-15 par secondes
 
 #### **3.10.4. Global scheduling**
 
@@ -711,7 +704,7 @@ Vérifiez que une instance seulement de `rng` s’exécute sur chaque node avec:
 <pre class="language-bash"><code class="lang-bash"><strong>docker@host1~$ docker service ps rng
 </strong></code></pre>
 
-> Ouvrez la `webui`, quel est votre vitesse de génération de `Dockercoins` ?&#x20;
+> Ouvrez la `webui`, quel est votre vitesse de génération de `Dockercoins` ?  25-30 par secondes
 
 #### **3.10.5. Mise à jour d’un service**
 
@@ -733,7 +726,7 @@ docker@host2~$ docker service update worker --image humboldtux/dockercoins_worke
 
 Attendez un peu que toutes les instances soient mises à jour, en surveillant la commande `watch` du premier terminal.
 
-> Une fois toutes les instances de `worker` mises à jour, quel est le taux de génération de `dockercoins` ? entre 15 et 30
+> Une fois toutes les instances de `worker` mises à jour, quel est le taux de génération de `dockercoins` ? entre 15 et 30 par secondes
 
 #### **3.10.6. Configuration du comportement des rolling-update**
 
@@ -754,7 +747,7 @@ Puis faites un `downgrade` du service en version `0.1` :
 docker@host2~$ docker service update worker --image theoghi/dockercoins_worker:0.1
 ```
 
-> Attendez que les instances soient downgradées, quel est le taux de génération de `Dockercoins` ? entre 15 et 25
+> Attendez que les instances soient downgradées, quel est le taux de génération de `Dockercoins` ? entre 15 et 25 par secondes
 
 > Modifiez la configuration de mise à jour du service `worker` avec 3 instances mises à jour en parallèle, et un délai de 2 secondes. Puis refaites la mise à jour du service `worker` en version `0.2`.
 
