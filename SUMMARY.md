@@ -1,3 +1,3 @@
 # Table of contents
 
-* [VIRT - Hyper-V](README.md)
+* [VIRT(1) - Hyper-V](README.md)
