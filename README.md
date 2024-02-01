@@ -12,4 +12,6 @@ Pour commencer,  j'ai installé le serveur Active Directory en interface graphiq
 
 <figure><img src=".gitbook/assets/promot.png" alt=""><figcaption><p>Création de la forêt et promotion en tant que contrôleur de domaine</p></figcaption></figure>
 
-Une fois l'installation du serveur AD, j'ai procédé à la création des deux serveurs hyper-v
+Une fois l'installation du serveur AD, j'ai procédé à la création des deux serveurs hyper-v. J'ai ensuite modifier leurs configuration IPs pour qu'ils puissent rejoindre le domaine créé précédemment.
+
+Une fois les serveurs hyper-v ajouter dans l'AD,&#x20;
