@@ -4,8 +4,6 @@ description: Documentation de mise en place d'hyper-v
 
 # VIRT(1) - Hyper-V
 
-
-
 ### 1. Installation de l'AD et HYPER-V
 
 Pour commencer,  j'ai installé le serveur Active Directory en interface graphique, puis j'ai installé le rôle Active Directory et fais la promotion du serveur en tant que contrôleur de domaine
