@@ -64,4 +64,58 @@ New-Partition -DiskNumber 1 -UseMaximumSize -AssignDriveLetter
 Format-Volume -DriveLetter E -FileSystem NTFS -Force
 ```
 
-Une fois la target créée et fonctionnelle, j'ai été créer le cluster grâce au gestionnaire de cluster de basculement&#x20;
+Une fois la target créée et fonctionnelle, j'ai été créer le cluster grâce au gestionnaire du cluster de basculement, en ajoutant les deux serveurs hyper-v, et en donnant une adresse ip au cluster.
+
+Une fois le cluster créer, j'ai créer une machine virtuelle Windows 11, avec toute les recommandations effactuee dans les parametres pour que l'installation de Windows 11 se fasse.&#x20;
+
+Puis pour que la machine puisse redemarrer sur l'autre serveur, il faut transferer les cles pour les mettres sur les deux serveur hyper-v.
+
+Pour ce faire, j'ai effectué les commandes suivantes
+
+Sur le serveur VIR-HV-1 pour exporter les clé du serveur 1
+
+```
+#PremiereCle
+$iiscert = Get-ChildItem -Path 'Cert:\LocalMachine\Shielded VM Local Certificates\' | where{$_.Thumbprint -eq "a377d8b45d5965973ce307dff655e4a85a47f3a3"}
+$exportPath = 'C:\ClusterStorge\Volume1\exported_encr.pfx'
+$pwd = ConvertTo-SecureString -String 'Pa$$w0rd' -Force -AsPlainText
+Export-PfxCertificate -Cert $iiscert -FilePath $exportPath -Password $pwd
+#DeuxiemeCle
+$iiscert = Get-ChildItem -Path 'Cert:\LocalMachine\Shielded VM Local Certificates\' | where{$_.Thumbprint -eq "a377d8b45d5965973ce307dff655e4a85a47f3a3"}
+$exportPath = 'C:\ClusterStorge\Volume1\exported_sign.pfx'
+$pwd = ConvertTo-SecureString -String 'Pa$$w0rd' -Force -AsPlainText
+Export-PfxCertificate -Cert $iiscert -FilePath $exportPath -Password $pwd
+```
+
+Commande pour importer les clés de VIR-HV-2
+
+```
+#Importer la premier cle de HV-2 sur HV-1
+Import-PfxCertificate -FilePath C:\ClusterStorage\Volume1\exported_encrcy2.pfx -CertStoreLocation 'Cert:\LocalMachine\Shielded VM Local Certificates\' -Password $pwd
+#Importer la deuxieme cle de HV-2 sur HV-1
+$Import-PfxCertificate -FilePath C:\ClusterStorage\Volume1\exported_sign2.pfx -CertStoreLocation 'Cert:\LocalMachine\Shielded VM Local Certificates\' -Password $pwd
+```
+
+Sur le serveur VIR-HV-2&#x20;
+
+```
+#PremiereCle
+$iiscert = Get-ChildItem -Path 'Cert:\LocalMachine\Shielded VM Local Certificates\' | where{$_.Thumbprint -eq "a377d8b45d5965973ce307dff655e4a85a47f3a3"}
+$exportPath = 'C:\ClusterStorge\Volume1\exported_enrcy2.pfx'
+$pwd = ConvertTo-SecureString -String 'Pa$$w0rd' -Force -AsPlainText
+Export-PfxCertificate -Cert $iiscert -FilePath $exportPath -Password $pwd
+#DeuxiemeCle
+$iiscert = Get-ChildItem -Path 'Cert:\LocalMachine\Shielded VM Local Certificates\' | where{$_.Thumbprint -eq "a377d8b45d5965973ce307dff655e4a85a47f3a3"}
+$exportPath = 'C:\ClusterStorge\Volume1\exported_sign2.pfx'
+$pwd = ConvertTo-SecureString -String 'Pa$$w0rd' -Force -AsPlainText
+Export-PfxCertificate -Cert $iiscert -FilePath $exportPath -Password $pwd
+```
+
+Commande pour importer les clé de VIR-HV-1
+
+```
+#Importer la premier cle de HV-1 sur HV-2
+Import-PfxCertificate -FilePath C:\ClusterStorage\Volume1\exported_encr.pfx -CertStoreLocation 'Cert:\LocalMachine\Shielded VM Local Certificates\' -Password $pwd
+#Importer la deuxieme cle de HV-1 sur HV-2
+$Import-PfxCertificate -FilePath C:\ClusterStorage\Volume1\exported_sign.pfx -CertStoreLocation 'Cert:\LocalMachine\Shielded VM Local Certificates\' -Password $pwd
+```
