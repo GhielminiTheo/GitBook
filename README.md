@@ -119,3 +119,5 @@ Import-PfxCertificate -FilePath C:\ClusterStorage\Volume1\exported_encr.pfx -Cer
 #Importer la deuxieme cle de HV-1 sur HV-2
 $Import-PfxCertificate -FilePath C:\ClusterStorage\Volume1\exported_sign.pfx -CertStoreLocation 'Cert:\LocalMachine\Shielded VM Local Certificates\' -Password $pwd
 ```
+
+Une fois les clé importée, la machine virtuelle Windows 11 est capable de redémarrer sur les deux hyperviseurs.
